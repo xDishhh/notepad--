@@ -3,12 +3,17 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import font
 
-def main():
-    # tkinter window
-    window = tk.Tk()
-    window.title("text-editor")
-    window.geometry("1200x660")
+# tkinter window
+window = tk.Tk()
+window.title("text-editor")
+window.geometry("1200x660")
 
+# variable for open_file_name
+global open_file_name
+open_file_name = False
+
+def main():
+    
     # create new file function
     def new_file():
         # delete old text
@@ -16,7 +21,10 @@ def main():
         # update status bars
         window.title("new file | text-editor")
         status_bar.config(text="new file")
-
+        
+        global open_file_name
+        open_file_name = False
+    
     # create open file function
     def open_file():
         # delete old text
@@ -24,6 +32,12 @@ def main():
 
         # update status bars
         get_file = filedialog.askopenfilename(initialdir="/home/ish/code/text-editor/", title="open file", filetypes=(("text files", "*.txt"), ("python", "*.py"), ("all files", "*.*")))
+        # check filename
+        if get_file:
+            #  make filename global
+            global open_file_name
+            open_file_name = get_file
+        
         name = get_file
         status_bar.config(text=f'saved {name}')
         name = name.replace("/home/ish/", "~/")
@@ -52,6 +66,22 @@ def main():
             get_file.write(my_text.get(1.0, END))
             get_file.close()
 
+    # save function
+    def save_file():
+        global open_file_name
+        if open_file_name:
+            # save file
+            get_file = open(open_file_name, 'w')
+            get_file.write(my_text.get(1.0, END))
+            get_file.close()
+            # add a pop up box here for the saved file
+
+
+            
+            status_bar.config(text=f'{open_file_name}')
+        else:
+            save_as_file()
+
 
 
     # main frame
@@ -77,7 +107,7 @@ def main():
     my_menu.add_cascade(label="file", menu = file_menu)
     file_menu.add_command(label="new", command=new_file)
     file_menu.add_command(label="open", command=open_file)
-    file_menu.add_command(label="save")
+    file_menu.add_command(label="save", command=save_file)
     file_menu.add_command(label="save as", command=save_as_file)
 
     file_menu.add_separator()
