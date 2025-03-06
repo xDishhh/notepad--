@@ -12,6 +12,10 @@ window.geometry("1200x660")
 global open_file_name
 open_file_name = False
 
+# variable for selected_text
+global selected_text
+selected_text = False
+
 def main():
     
     # create new file function
@@ -81,7 +85,49 @@ def main():
             status_bar.config(text=f'{open_file_name}')
         else:
             save_as_file()
+    
+    # cut function
+    def cut_text(e):
+        global selected_text
+        # check if keyboard shortcut used
+        if e:
+            selected_text = window.clipboard_get()
+        else:
+            if my_text.selection_get():
+                # get selected text
+                selected_text = my_text.selection_get()
+                # deleted selected text
+                my_text.delete("sel.first", "sel.last")
+                # clear clipboard then append selected_text
+                window.clipboard_clear()
+                window.clipboard_append(selected_text)
 
+
+    # copy function
+    def copy_text(e):
+        # check how was text copied either shortcut or edit -> copy
+        global selected_text
+        if e:
+            selected_text = window.clipboard_get()
+
+        if my_text.selection_get():
+            # get selected text
+            selected_text = my_text.selection_get()
+            # clear clipboard then append selected_text
+            window.clipboard_clear()
+            window.clipboard_append(selected_text)
+
+    # paste function
+    def paste_text(e):
+        global selected_text
+        # check if keyboard shortcut used
+        if e:
+            selected_text = window.clipboard_get()
+        else:
+            if selected_text:
+                position = my_text.index(INSERT)
+                my_text.insert(position, selected_text)
+                window.clipboard_append(selected_text)
 
 
     # main frame
@@ -115,15 +161,20 @@ def main():
     # edit
     edit_menu = Menu(my_menu, tearoff=False)
     my_menu.add_cascade(label="edit", menu = edit_menu)
-    edit_menu.add_command(label="cut")
-    edit_menu.add_command(label="copy")
-    edit_menu.add_command(label="paste")
+    edit_menu.add_command(label="cut    (Ctrl+x)", command=lambda:cut_text(False))
+    edit_menu.add_command(label="copy   (Ctrl+c)", command=lambda:copy_text(False))
+    edit_menu.add_command(label="paste  (Ctrl+v)", command=lambda:paste_text(False))
     edit_menu.add_command(label="undo")
     edit_menu.add_command(label="redo")
 
     # status bar at bottom
     status_bar = Label(window, text="ready, set, code!", anchor=E, bg="silver")
     status_bar.pack(fill=X, side=BOTTOM, ipady=5)
+
+    # bindings
+    window.bind('<Control-x>', cut_text)
+    window.bind('<Control-c>', copy_text)
+    window.bind('<Control-v>', paste_text)
 
     # keeps window open
     window.mainloop()
