@@ -6,7 +6,7 @@ from tkinter import font
 # tkinter window
 window = tk.Tk()
 window.title("text-editor")
-window.geometry("1200x660")
+window.geometry("1200x700")
 
 # variable for open_file_name
 global open_file_name
@@ -153,15 +153,15 @@ def main():
 
     # main frame
     my_frame = Frame(window)
-    my_frame.pack(pady=5)
+    my_frame.pack(pady=0)
 
     # scroll bar
     text_scroll = Scrollbar(my_frame)
     text_scroll.pack(side = RIGHT, fill = Y)
     
     # text box
-    my_text = Text(my_frame, width = 40, height = 20, font = ("Fira Mono", 20), selectbackground="yellow", selectforeground="black", undo = True, yscrollcommand = text_scroll.set )
-    my_text.pack()
+    my_text = Text(my_frame, width = 100, height = 20, font = ("Fira Mono", 20), selectbackground="yellow", selectforeground="black", undo = True, yscrollcommand = text_scroll.set )
+    my_text.pack(fill=BOTH, expand=True)
 
     # configure
     text_scroll.config(command = my_text.yview)
@@ -182,11 +182,13 @@ def main():
     # edit
     edit_menu = Menu(my_menu, tearoff=False)
     my_menu.add_cascade(label="edit", menu = edit_menu)
-    edit_menu.add_command(label="cut    (Ctrl+x)", command=lambda:cut_text(False))
-    edit_menu.add_command(label="copy   (Ctrl+c)", command=lambda:copy_text(False))
-    edit_menu.add_command(label="paste  (Ctrl+v)", command=lambda:paste_text(False))
-    edit_menu.add_command(label="undo")
-    edit_menu.add_command(label="redo")
+    edit_menu.add_command(label="cut", command=lambda:cut_text(False), accelerator="(Ctrl+x)")
+    edit_menu.add_command(label="copy", command=lambda:copy_text(False), accelerator="(Ctrl+c)")
+    edit_menu.add_command(label="paste", command=lambda:paste_text(False), accelerator="(Ctrl+v)")
+    edit_menu.add_separator()
+    # undo adn redo
+    edit_menu.add_command(label="undo", command=my_text.edit_undo, accelerator="(Ctrl+z)")
+    edit_menu.add_command(label="redo", command=my_text.edit_redo, accelerator="(Ctrl+y)")
 
     # dark and light mode
     settings_menu = Menu(my_menu, tearoff=False)
