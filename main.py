@@ -129,6 +129,27 @@ def main():
                 my_text.insert(position, selected_text)
                 window.clipboard_append(selected_text)
 
+    # dark mode 
+    def dark_mode():
+        window.config(bg='black')
+        my_text.config(bg='black', fg='white', insertbackground='white')  # text box styling
+        status_bar.config(bg='gray', fg='white')  # status bar fixed gray color
+        my_menu.config(bg='black', fg='white')  # menu bar color
+        file_menu.config(bg='black', fg='white')  # file menu color
+        edit_menu.config(bg='black', fg='white')  # edit menu color
+        settings_menu.config(bg='black', fg='white') # settings menu color
+
+    # light mode 
+    def light_mode():
+        window.config(bg='white')
+        my_text.config(bg='white', fg='black', insertbackground='black')  # text box styling
+        status_bar.config(bg='gray', fg='black')  # status bar fixed gray color
+        my_menu.config(bg='white', fg='black')  # menu bar color
+        file_menu.config(bg='white', fg='black')  # file menu color
+        edit_menu.config(bg='white', fg='black')  # edit menu color
+        settings_menu.config(bg='white', fg='black') # settings menu color
+
+
 
     # main frame
     my_frame = Frame(window)
@@ -139,7 +160,7 @@ def main():
     text_scroll.pack(side = RIGHT, fill = Y)
     
     # text box
-    my_text = Text(my_frame, width = 50, height = 20, font = ("Fira Mono", 20), selectbackground="yellow", selectforeground="black", undo = True, yscrollcommand = text_scroll.set )
+    my_text = Text(my_frame, width = 40, height = 20, font = ("Fira Mono", 20), selectbackground="yellow", selectforeground="black", undo = True, yscrollcommand = text_scroll.set )
     my_text.pack()
 
     # configure
@@ -167,8 +188,15 @@ def main():
     edit_menu.add_command(label="undo")
     edit_menu.add_command(label="redo")
 
+    # dark and light mode
+    settings_menu = Menu(my_menu, tearoff=False)
+    my_menu.add_cascade(label="settings", menu = settings_menu)
+    settings_menu.add_separator()
+    settings_menu.add_command(label="dark mode", command=dark_mode)
+    settings_menu.add_command(label="light mode", command=light_mode)
+
     # status bar at bottom
-    status_bar = Label(window, text="ready, set, code!", anchor=E, bg="silver")
+    status_bar = Label(window, text="ready, set, code!", anchor=E, bg="grey")
     status_bar.pack(fill=X, side=BOTTOM, ipady=5)
 
     # bindings
