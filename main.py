@@ -2,6 +2,11 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
 from tkinter import font
+import os
+from pathlib import Path
+
+# Get user's home directory
+HOME_DIR = str(Path.home())
 
 # tkinter window
 window = tk.Tk()
@@ -42,55 +47,80 @@ def main():
         my_text.delete("1.0", END)
 
         # update status bars
-        get_file = filedialog.askopenfilename(initialdir="/home/ish/code/text-editor/", title="open file", filetypes=(("text files", "*.txt"), ("python", "*.py"), ("all files", "*.*")))
+        get_file = filedialog.askopenfilename(
+            initialdir=HOME_DIR, 
+            title="open file", 
+            filetypes=(("text files", "*.txt"), ("python", "*.py"), ("all files", "*.*"))
+        )
+            
         # check filename
         if get_file:
             #  make filename global
             global open_file_name
             open_file_name = get_file
         
-        name = get_file
-        status_bar.config(text=f'saved {name}')
-        name = name.replace("/home/ish/", "~/")
-        window.title(f'{name} | text-editor')
+            name = get_file
+            status_bar.config(text=f'opened {name}')
+            
+            # Replace the full home directory path with ~ for display
+            name = name.replace(HOME_DIR, "~")
+            window.title(f'{name} | text-editor')
 
-        # open file
-        get_file = open(get_file, 'r')
-        content = get_file.read()
-        # add file content to text box
-        my_text.insert(END, content)
-        # close opened file
-        get_file.close()
-        
-        # Update line numbers
-        update_line_numbers()
+            try:
+                # open file
+                with open(get_file, 'r') as file:
+                    content = file.read()
+                # add file content to text box
+                my_text.insert(END, content)
+                
+            except Exception as e:
+                status_bar.config(text=f'Error opening file: {str(e)}')
+            
+            # Update line numbers
+            update_line_numbers()
 
     # save as function
     def save_as_file():
-        get_file = filedialog.asksaveasfilename(defaultextension=".*", initialdir="/home/ish/code/text-editor/", title="save file", filetypes=(("text files", "*.txt"), ("python", "*.py"), ("all files", "*.*")))
+        get_file = filedialog.asksaveasfilename(
+            defaultextension=".txt", 
+            initialdir=HOME_DIR, 
+            title="save file", 
+            filetypes=(("text files", "*.txt"), ("python", "*.py"), ("all files", "*.*"))
+        )
+            
         if get_file:
             # update status bars
             name = get_file
-            status_bar.config(text=f'{name}')
-            name = name.replace("/home/ish/", "~/")
+            status_bar.config(text=f'saved {name}')
+            
+            # Replace the full home directory path with ~ for display
+            name = name.replace(HOME_DIR, "~")
             window.title(f'{name} | text-editor')
 
-            # save file
-            get_file = open(get_file, 'w')
-            get_file.write(my_text.get(1.0, END))
-            get_file.close()
+            try:
+                # save file
+                with open(get_file, 'w') as file:
+                    file.write(my_text.get(1.0, END))
+                    
+                # Update global variable
+                global open_file_name
+                open_file_name = get_file
+                    
+            except Exception as e:
+                status_bar.config(text=f'Error saving file: {str(e)}')
 
     # save function
     def save_file():
         global open_file_name
         if open_file_name:
-            # save file
-            get_file = open(open_file_name, 'w')
-            get_file.write(my_text.get(1.0, END))
-            get_file.close()
-            # add a pop up box here for the saved file
-            
-            status_bar.config(text=f'{open_file_name}')
+            try:
+                # save file
+                with open(open_file_name, 'w') as file:
+                    file.write(my_text.get(1.0, END))
+                
+                status_bar.config(text=f'saved {open_file_name}')
+            except Exception as e:
+                status_bar.config(text=f'Error saving file: {str(e)}')
         else:
             save_as_file()
 
@@ -109,6 +139,8 @@ def main():
                 # clear clipboard then append selected_text
                 window.clipboard_clear()
                 window.clipboard_append(selected_text)
+                # Update line numbers
+                update_line_numbers()
 
 
     # copy function
@@ -135,8 +167,6 @@ def main():
             if selected_text:
                 position = my_text.index(INSERT)
                 my_text.insert(position, selected_text)
-                window.clipboard_append(selected_text)
-                
                 # Update line numbers after pasting
                 update_line_numbers()
 
